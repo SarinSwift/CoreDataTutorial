@@ -21,4 +21,17 @@ class ItemStore: NSObject {
         
         return container
     }()
+    
+    // MARK: - Save Core Data Context
+    
+    func saveContext() {
+        let viewContext = persistentContainer.viewContext
+        if viewContext.hasChanges {
+            do {
+                try viewContext.save()
+            } catch let error {
+                fatalError("Unresolved error \(error), \(error.localizedDescription)")
+            }
+        }
+    }
 }

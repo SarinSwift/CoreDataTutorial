@@ -27,17 +27,35 @@ class ViewController: UIViewController {
         flow.itemSize = CGSize(width: screenSize.width / 2 - horizontalPadding * 2, height: screenSize.width / 2 - verticalPadding * 2)
         flow.sectionInset = UIEdgeInsets(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
         collectionView.collectionViewLayout = flow
+        
+        updateDataSource()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         store.saveContext()
+        updateDataSource()
     }
 
     func createNewItem() -> Item {
         let newItem = NSEntityDescription.insertNewObject(forEntityName: "Item", into: store.persistentContainer.viewContext) as! Item
         return newItem
+    }
+    
+    func updateDataSource() {
+        // populates the array with fetch results when the case is .success, or we delete all items if is .failure
+        self.store.fetchPersistedData { (result) in
+            switch result {
+            case let .success(items):
+                self.items = items
+            case .failure(_):
+                self.items.removeAll()
+            }
+            
+            // reload the collection view to present the current data set
+            self.collectionView.reloadSections(IndexSet(integer: 0))
+        }
     }
     
     func add(saved item: Item) {

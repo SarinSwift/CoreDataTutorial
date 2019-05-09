@@ -34,4 +34,23 @@ class ItemStore: NSObject {
             }
         }
     }
+    
+    // MARK: - Fetch Core Data Context
+    
+    func fetchPersistedData(completion: @escaping (FetchItemsResult) -> Void) {
+        let fetchRequest: NSFetchRequest<Item> = Item.fetchRequest()
+        let viewContext = persistentContainer.viewContext
+        
+        do {
+            let allItems = try viewContext.fetch(fetchRequest)
+            completion(.success(allItems))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+}
+
+enum FetchItemsResult {
+    case success([Item])
+    case failure(Error)
 }

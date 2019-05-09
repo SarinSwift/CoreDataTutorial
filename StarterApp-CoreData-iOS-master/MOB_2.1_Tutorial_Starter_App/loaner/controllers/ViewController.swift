@@ -69,8 +69,17 @@ class ViewController: UIViewController {
     }
     
     func deleteItem(at index: Int) {
+        
+        // Delete from the context
+        let viewContext = store.persistentContainer.viewContext
+        viewContext.delete(items[index])
+        
+        // Delete from the data source
         items.remove(at: index)
         collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
+        
+        // Save changes to the Managed Object Context
+        store.saveContext()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
